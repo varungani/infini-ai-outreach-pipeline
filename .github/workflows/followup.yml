@@ -1,0 +1,31 @@
+name: Daily Follow-up Runner
+
+on:
+  schedule:
+    - cron: '0 9 * * 1-5'   # Mon–Fri 9am UTC
+  workflow_dispatch:          # Manual trigger from GitHub Actions tab
+
+jobs:
+  run-followups:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Write service account credentials
+        run: echo '${{ secrets.GOOGLE_CREDS_JSON }}' > service_account.json
+      - name: Run follow-up engine
+        env:
+          GROQ_API_KEY:       ${{ secrets.GROQ_API_KEY }}
+          GOOGLE_SHEET_ID:    ${{ secrets.GOOGLE_SHEET_ID }}
+          GOOGLE_CREDS_FILE:  service_account.json
+          GMAIL_USER:         ${{ secrets.GMAIL_USER }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          SENDER_NAME:        ${{ secrets.SENDER_NAME }}
+        run: python followup.py
+      - name: Clean up credentials
+        if: always()
+        run: rm -f service_account.json

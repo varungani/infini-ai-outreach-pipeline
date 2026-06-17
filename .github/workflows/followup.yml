@@ -9,14 +9,16 @@ jobs:
   run-followups:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v4.2.2
+      - uses: actions/setup-python@v5.3.0
         with:
           python-version: '3.11'
       - name: Install dependencies
         run: pip install -r requirements.txt
       - name: Write service account credentials
-        run: echo '${{ secrets.GOOGLE_CREDS_JSON }}' > service_account.json
+        env:
+          CREDS_JSON: ${{ secrets.GOOGLE_CREDS_JSON }}
+        run: echo "$CREDS_JSON" > service_account.json
       - name: Run follow-up engine
         env:
           GROQ_API_KEY:       ${{ secrets.GROQ_API_KEY }}

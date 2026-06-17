@@ -25,7 +25,7 @@ jobs:
           GMAIL_USER:         ${{ secrets.GMAIL_USER }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
           SENDER_NAME:        ${{ secrets.SENDER_NAME }}
-        run: python followup.py
+        run: python followup.py --dry-run
       - name: Clean up credentials
         if: always()
         run: rm -f service_account.json
